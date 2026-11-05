@@ -32,18 +32,52 @@ const isOn = (item) => item.href === path || (item.also ?? []).includes(path);
       <img src="/images/a52603f399.jpg" alt="Université du Luxembourg" />
       <img src="/images/52f4dff6e0.png" alt="Faculty of Humanities, Education and Social Sciences" />
     </footer>
+    <dialog class="lb" data-video-lb aria-label="Video player">
+      <button class="lb-x" type="button" aria-label="Close" data-close>×</button>
+      <button class="cf-nav prev" type="button" aria-label="Previous video" data-prev>
+        <svg viewBox="0 0 20 40" aria-hidden="true"><path d="M18 2 2 20l16 18" /></svg>
+      </button>
+      <div class="lb-box">
+        <div class="lb-frame" data-frame></div>
+        <p class="lb-info" data-info></p>
+      </div>
+      <button class="cf-nav next" type="button" aria-label="Next video" data-next>
+        <svg viewBox="0 0 20 40" aria-hidden="true"><path d="m2 2 16 18L2 38" /></svg>
+      </button>
+    </dialog>
     <script>
-      // Videos only load from YouTube once someone presses play.
-      document.querySelectorAll<HTMLButtonElement>('[data-yt]').forEach((b) => {
-        b.addEventListener('click', () => {
-          const f = document.createElement('iframe');
-          f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1`;
-          f.title = b.title;
-          f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-          f.className = 'yt-frame';
-          b.replaceWith(f);
-        });
+      // Videos open in a large player over the page, and only load from YouTube once someone presses play.
+      const videos = [...document.querySelectorAll<HTMLButtonElement>('[data-yt]')];
+      const lb = document.querySelector<HTMLDialogElement>('[data-video-lb]')!;
+      const frame = lb.querySelector<HTMLElement>('[data-frame]')!;
+      const info = lb.querySelector<HTMLElement>('[data-info]')!;
+      let current = 0;
+
+      function play(i: number) {
+        current = (i + videos.length) % videos.length;
+        const b = videos[current];
+        const f = document.createElement('iframe');
+        f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0&playsinline=1`;
+        f.title = b.title;
+        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        frame.replaceChildren(f);
+        info.textContent = b.title === 'Video' ? '' : b.title;
+      }
+
+      videos.forEach((b, i) => b.addEventListener('click', () => { play(i); lb.showModal(); }));
+      // With one video on the page there is nothing to move to.
+      lb.querySelectorAll<HTMLElement>('.cf-nav').forEach((n) => { n.hidden = videos.length < 2; });
+      lb.querySelector('[data-prev]')!.addEventListener('click', () => play(current - 1));
+      lb.querySelector('[data-next]')!.addEventListener('click', () => play(current + 1));
+      lb.querySelector('[data-close]')!.addEventListener('click', () => lb.close());
+      lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+      lb.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') play(current - 1);
+        if (e.key === 'ArrowRight') play(current + 1);
       });
+      // Closing removes the player, which stops the video.
+      lb.addEventListener('close', () => { frame.replaceChildren(); videos[current]?.focus(); });
     </script>
     <script is:inline>
       var sc_project = 13177695;
