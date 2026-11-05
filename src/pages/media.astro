@@ -17,7 +17,9 @@ import { workshops } from '../data/gallery.js';
         <button type="button" role="tab" data-tab={i} aria-selected={i === 0 ? 'true' : 'false'}>Workshop {i + 1}</button>
       ))}
     </div>
+  </div>
 
+  <div class="cf-page">
     {workshops.map((w, i) => (
       <section class="ws" data-ws={i} hidden={i !== 0}>
         <h2 class="ws-title">{w.title}</h2>
@@ -55,7 +57,7 @@ import { workshops } from '../data/gallery.js';
   <script>
     const lb = document.querySelector<HTMLDialogElement>('[data-lb]')!;
     const big = lb.querySelector<HTMLImageElement>('[data-big]')!;
-    let active: { step: (by: number) => void; show: () => void } | null = null;
+    let active: { step: (by: number) => void; show: () => void; layout: () => void } | null = null;
     const carousels: Record<string, typeof active> = {};
 
     document.querySelectorAll<HTMLElement>('[data-ws]').forEach((ws) => {
@@ -83,6 +85,8 @@ import { workshops } from '../data/gallery.js';
           item.style.pointerEvents = far ? 'none' : '';
           item.classList.toggle('active', d === 0);
           item.tabIndex = d === 0 ? 0 : -1;
+          // Fetch the photos around the middle one ahead of time, so they are ready when you move on.
+          if (!ws.hidden && Math.abs(d) <= 2) item.querySelector('img')!.loading = 'eager';
         });
         count.textContent = `${current + 1} / ${items.length}`;
       }
@@ -114,7 +118,14 @@ import { workshops } from '../data/gallery.js';
         step(e.key === 'ArrowLeft' ? -1 : 1);
       });
 
-      const carousel = { step, show };
+      // Upright photos are shown whole, not cropped.
+      items.forEach((item) => {
+        const img = item.querySelector('img')!;
+        const mark = () => img.classList.toggle('tall', img.naturalHeight > img.naturalWidth);
+        if (img.complete) mark(); else img.addEventListener('load', mark);
+      });
+
+      const carousel = { step, show, layout };
       carousels[ws.dataset.ws ?? ''] = carousel;
       cf.classList.add('ready');
       layout();
@@ -126,6 +137,7 @@ import { workshops } from '../data/gallery.js';
       tab.addEventListener('click', () => {
         document.querySelectorAll<HTMLElement>('[data-ws]').forEach((ws) => { ws.hidden = ws.dataset.ws !== tab.dataset.tab; });
         document.querySelectorAll('[data-tab]').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+        carousels[tab.dataset.tab ?? '']?.layout();
       });
     });
 
