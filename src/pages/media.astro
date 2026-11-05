@@ -1,0 +1,141 @@
+---
+import Base from '../layouts/Base.astro';
+import { workshops } from '../data/gallery.js';
+---
+<Base title="MEDIA" path="/fnr">
+  <div class="page">
+    <h1 class="title">FNR PSP-Classic 2025</h1>
+    <nav class="subnav" aria-label="FNR PSP-Classic">
+      <a href="/technologies">TECHNOLOGIES</a>
+      <a href="/team">TEAM</a>
+      <a href="/media" class="on">MEDIA</a>
+      <a href="/agenda">AGENDA</a>
+    </nav>
+
+    <div class="tabs" role="tablist" aria-label="Workshops">
+      {workshops.map((w, i) => (
+        <button type="button" role="tab" data-tab={i} aria-selected={i === 0 ? 'true' : 'false'}>Workshop {i + 1}</button>
+      ))}
+    </div>
+
+    {workshops.map((w, i) => (
+      <section class="ws" data-ws={i} hidden={i !== 0}>
+        <h2 class="ws-title">{w.title}</h2>
+        <div class="cf" data-cf tabindex="0" aria-roledescription="carousel" aria-label={w.title}>
+          <div class="cf-track">
+            {w.photos.map((src) => (
+              <button class="cf-item" type="button" data-full={src} aria-label="Open photo">
+                <img src={src} alt="" draggable="false" loading="lazy" />
+              </button>
+            ))}
+          </div>
+          <button class="cf-nav prev" type="button" aria-label="Previous photo" data-prev>
+            <svg viewBox="0 0 20 40" aria-hidden="true"><path d="M18 2 2 20l16 18" /></svg>
+          </button>
+          <button class="cf-nav next" type="button" aria-label="Next photo" data-next>
+            <svg viewBox="0 0 20 40" aria-hidden="true"><path d="m2 2 16 18L2 38" /></svg>
+          </button>
+        </div>
+        <p class="cf-count" data-count aria-live="polite"></p>
+      </section>
+    ))}
+  </div>
+
+  <dialog class="lb" data-lb aria-label="Photo">
+    <button class="lb-x" type="button" aria-label="Close" data-close>×</button>
+    <button class="cf-nav prev" type="button" aria-label="Previous photo" data-lb-prev>
+      <svg viewBox="0 0 20 40" aria-hidden="true"><path d="M18 2 2 20l16 18" /></svg>
+    </button>
+    <img data-big alt="" />
+    <button class="cf-nav next" type="button" aria-label="Next photo" data-lb-next>
+      <svg viewBox="0 0 20 40" aria-hidden="true"><path d="m2 2 16 18L2 38" /></svg>
+    </button>
+  </dialog>
+
+  <script>
+    const lb = document.querySelector<HTMLDialogElement>('[data-lb]')!;
+    const big = lb.querySelector<HTMLImageElement>('[data-big]')!;
+    let active: { step: (by: number) => void; show: () => void } | null = null;
+    const carousels: Record<string, typeof active> = {};
+
+    document.querySelectorAll<HTMLElement>('[data-ws]').forEach((ws) => {
+      const cf = ws.querySelector<HTMLElement>('[data-cf]')!;
+      const count = ws.querySelector<HTMLElement>('[data-count]')!;
+      const items = [...cf.querySelectorAll<HTMLButtonElement>('.cf-item')];
+      let current = 0;
+
+      // Shortest distance from the centre, so the row wraps around.
+      const offsetOf = (i: number) => {
+        let d = (i - current + items.length) % items.length;
+        if (d > items.length / 2) d -= items.length;
+        return d;
+      };
+
+      function layout() {
+        items.forEach((item, i) => {
+          const d = offsetOf(i);
+          const side = Math.sign(d);
+          const far = Math.abs(d) > 1;
+          const move = d === 0 ? '0%, 0, 0' : far ? `${side * 168}%, 0, -1000px` : `${side * 105}%, 0, -600px`;
+          item.style.transform = `translate(-50%, -50%) translate3d(${move}) rotateY(${-side * 22}deg)`;
+          item.style.opacity = far ? '0' : '1';
+          item.style.zIndex = String(100 - Math.abs(d) * 10);
+          item.style.pointerEvents = far ? 'none' : '';
+          item.classList.toggle('active', d === 0);
+          item.tabIndex = d === 0 ? 0 : -1;
+        });
+        count.textContent = `${current + 1} / ${items.length}`;
+      }
+
+      const go = (i: number) => { current = (i + items.length) % items.length; layout(); };
+      const show = () => { big.src = items[current].dataset.full ?? ''; };
+      const step = (by: number) => { go(current + by); if (lb.open) show(); };
+
+      // Swiping or dragging changes photo; a click opens the middle one or brings a side one forward.
+      let startX: number | null = null;
+      let dragged = false;
+      cf.addEventListener('pointerdown', (e) => { startX = e.clientX; dragged = false; });
+      cf.addEventListener('pointerup', (e) => {
+        if (startX === null) return;
+        const moved = e.clientX - startX;
+        startX = null;
+        if (Math.abs(moved) > 40) { dragged = true; step(moved < 0 ? 1 : -1); }
+      });
+      items.forEach((item, i) => item.addEventListener('click', () => {
+        if (dragged) { dragged = false; return; }
+        if (i === current) { active = carousel; show(); lb.showModal(); }
+        else go(i);
+      }));
+      cf.querySelector('[data-prev]')!.addEventListener('click', () => step(-1));
+      cf.querySelector('[data-next]')!.addEventListener('click', () => step(1));
+      cf.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        step(e.key === 'ArrowLeft' ? -1 : 1);
+      });
+
+      const carousel = { step, show };
+      carousels[ws.dataset.ws ?? ''] = carousel;
+      cf.classList.add('ready');
+      layout();
+      // Animate only from now on, so the row doesn't slide into place on page load.
+      requestAnimationFrame(() => requestAnimationFrame(() => cf.classList.add('live')));
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll<HTMLElement>('[data-ws]').forEach((ws) => { ws.hidden = ws.dataset.ws !== tab.dataset.tab; });
+        document.querySelectorAll('[data-tab]').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+      });
+    });
+
+    lb.querySelector('[data-lb-prev]')!.addEventListener('click', () => active?.step(-1));
+    lb.querySelector('[data-lb-next]')!.addEventListener('click', () => active?.step(1));
+    lb.querySelector('[data-close]')!.addEventListener('click', () => lb.close());
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+    lb.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') active?.step(-1);
+      if (e.key === 'ArrowRight') active?.step(1);
+    });
+  </script>
+</Base>

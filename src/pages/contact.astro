@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="INTERACTIVE" path="/contact">
+  <div class="page">
+    <h1 class="sub" style="margin-top:0">Send us a message</h1>
+    <p>DROP US A LINE</p>
+    <form class="form" data-contact>
+      <div class="fields">
+        <input type="text" name="name" placeholder="Name" aria-label="Name" required />
+        <input type="email" name="email" placeholder="Email" aria-label="Email" required />
+        <input type="tel" name="phone" placeholder="Phone" aria-label="Phone" />
+      </div>
+      <textarea name="message" placeholder="Type your message here..." aria-label="Message"></textarea>
+      <button type="submit">Submit</button>
+      <p class="form-note" data-note hidden></p>
+    </form>
+    <h2 class="sub">Interesting webpage? youtube video? .. or any other relevant link? LET US KNOW!</h2>
+  </div>
+  <script>
+    const TO = 'luc.nijs@uni.lu';
+    const form = document.querySelector<HTMLFormElement>('[data-contact]');
+    const note = document.querySelector<HTMLElement>('[data-note]');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const phone = String(data.get('phone') || '').trim();
+      const body = [
+        `Name: ${data.get('name')}`,
+        `Email: ${data.get('email')}`,
+        ...(phone ? [`Phone: ${phone}`] : []),
+        '',
+        String(data.get('message')),
+      ].join('\n');
+      const url = `mailto:${TO}?subject=${encodeURIComponent('via website')}&body=${encodeURIComponent(body)}`;
+      if (note) {
+        note.hidden = false;
+        note.innerHTML = 'Your email program should open with this message, ready to send. If it doesn’t, <a data-link>open it here</a> or write to ' + TO + '.';
+        note.querySelector('a')?.setAttribute('href', url);
+      }
+      window.location.href = url;
+    });
+  </script>
+</Base>

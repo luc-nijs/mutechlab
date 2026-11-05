@@ -1,0 +1,55 @@
+---
+import '../styles/site.css';
+import { nav } from '../data/nav.js';
+
+interface Props { title: string; path: string }
+const { title, path } = Astro.props;
+
+const isOn = (item) => item.href === path || (item.also ?? []).includes(path);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | MuTechLab</title>
+    <meta name="description" content="Integrating music technology in musicians' and music teachers' identity" />
+    <meta name="keywords" content="university of luxembourg, bachelor in music education, music, technology, music technology, innovative music teaching" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@300..700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="top">
+      <a href="/" class="logo-link"><img class="logo" src="/images/2b51b9b94f.jpg" alt="MuTechLab" width="72" height="72" /></a>
+      <nav aria-label="Main">
+        <ul class="menu">
+          {nav.map((item) => <li><a href={item.href} class={isOn(item) ? 'on' : ''}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+    </header>
+    <main><slot /></main>
+    <footer>
+      <img src="/images/a52603f399.jpg" alt="Université du Luxembourg" />
+      <img src="/images/52f4dff6e0.png" alt="Faculty of Humanities, Education and Social Sciences" />
+    </footer>
+    <script>
+      // Videos only load from YouTube once someone presses play.
+      document.querySelectorAll<HTMLButtonElement>('[data-yt]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const f = document.createElement('iframe');
+          f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1`;
+          f.title = b.title;
+          f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+          f.className = 'yt-frame';
+          b.replaceWith(f);
+        });
+      });
+    </script>
+    <script is:inline>
+      var sc_project = 13177695;
+      var sc_invisible = 1;
+      var sc_security = '6dbe20df';
+    </script>
+    <script is:inline async src="https://www.statcounter.com/counter/counter.js"></script>
+  </body>
+</html>
