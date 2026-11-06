@@ -2,8 +2,22 @@
 import '../styles/site.css';
 import { nav } from '../data/nav.js';
 
-interface Props { title: string; path: string }
-const { title, path } = Astro.props;
+interface Props { title: string; description?: string; path: string; noindex?: boolean }
+const { title, description = '', path, noindex = false } = Astro.props;
+
+// path only picks the highlighted menu item; the page's own address comes from the URL.
+const site = Astro.site ?? 'https://www.mutechlab.education';
+const own = Astro.url.pathname.replace(/\/?$/, '/');
+const canonical = new URL(own, site).href;
+const ogImage = new URL('/images/og-mutechlab.jpg', site).href;
+const siteData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'MuTechLab',
+  url: new URL('/', site).href,
+  description: 'Music technology in the training of music teachers and music students, an initiative of the University of Luxembourg.',
+  publisher: { '@type': 'CollegeOrUniversity', name: 'University of Luxembourg', url: 'https://www.uni.lu/' },
+};
 
 const isOn = (item) => item.href === path || (item.also ?? []).includes(path);
 ---
@@ -12,9 +26,22 @@ const isOn = (item) => item.href === path || (item.also ?? []).includes(path);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | MuTechLab</title>
-    <meta name="description" content="Integrating music technology in musicians' and music teachers' identity" />
-    <meta name="keywords" content="university of luxembourg, bachelor in music education, music, technology, music technology, innovative music teaching" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MuTechLab" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The MuTechLab logo: a ring of coloured sound waves" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {Astro.url.pathname === '/' && <script type="application/ld+json" set:html={JSON.stringify(siteData).replace(/</g, '\\u003c')} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@300..700&display=swap" rel="stylesheet" />
   </head>
