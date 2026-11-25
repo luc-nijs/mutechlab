@@ -34,6 +34,11 @@ const { file, mode, title = '' } = Astro.props;
   function show(root: HTMLElement, html: string) {
     const out = root.querySelector<HTMLElement>('.lock-out')!;
     if (root.dataset.mode === 'app') {
+      // A decrypted app runs from a blob: address, which can't take a new URL
+      // (apps that put e.g. ?lang= in the address would stop there), so such changes are skipped.
+      const guard = '<script>{const r=history.replaceState.bind(history),p=history.pushState.bind(history);'
+        + 'history.replaceState=(...a)=>{try{r(...a)}catch(e){}};history.pushState=(...a)=>{try{p(...a)}catch(e){}};}<\/script>';
+      html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + guard) : guard + html;
       const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
       out.innerHTML = '';
       const bar = document.createElement('p');
