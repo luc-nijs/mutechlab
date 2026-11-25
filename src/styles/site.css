@@ -73,6 +73,8 @@ header.top nav { flex: 1; }
 .app-back span { margin: 0 6px; color: var(--mid); }
 .app-frame { display: block; width: 100%; height: calc(100vh - 170px); min-height: 560px; border: 1px solid var(--pale); background: #fffdf7; }
 
+.disclaimer { max-width: 680px; margin: 28px 0 0; padding-top: 14px; border-top: 1px solid var(--pale); color: var(--mid); font-size: 13px; font-style: italic; }
+
 /* Password form for protected pages */
 .lock-form { max-width: 360px; padding: 18px; border: 1px solid var(--pale); }
 .lock-form p { margin: 0 0 12px; }
