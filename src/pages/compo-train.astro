@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Locked from '../components/Locked.astro';
+// Password protected for now. The app is in _protected/compo-train.html, a copy of
+// Dropbox/LUXEMBURG/UniLu_TechProject/COMPO/train-composer/index.html,
+// encrypted into public/protected/ by scripts/protect.mjs.
+// After changing the app there, copy it to _protected/ and run the script again.
+---
+<Base title="The Compo-Train | MuTechLab" description="The Compo-Train: make your own composition in an intuitive way." path="/compo-train" noindex>
+  <div class="page app-page">
+<Locked file="/protected/compo-train.json" mode="app" title="The Compo-Train" />
+  </div>
+</Base>

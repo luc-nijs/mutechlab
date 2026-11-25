@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" role="img" aria-labelledby="t">
+  <title id="t">A smiling little locomotive pulling a DO wagon</title>
+  <g stroke="#2b2b2b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- rails -->
+    <path d="M12 214 H468" fill="none" stroke="#c9b28f" stroke-width="5"/>
+    <!-- steam puffs -->
+    <circle cx="96" cy="44" r="15" fill="#fff"/>
+    <circle cx="116" cy="30" r="19" fill="#fff"/>
+    <circle cx="142" cy="24" r="14" fill="#fff"/>
+    <circle cx="160" cy="14" r="9" fill="#fff"/>
+    <!-- coupling -->
+    <path d="M232 178 H262" fill="none"/>
+    <!-- wagon -->
+    <path d="M262 96 L282 72 H448 L466 96 Z" fill="#f6b8b3"/>
+    <rect x="262" y="96" width="204" height="94" rx="14" fill="#fffaf0"/>
+    <rect x="280" y="116" width="168" height="34" rx="17" fill="#e5463b"/>
+    <circle cx="304" cy="133" r="7" fill="#fff"/>
+    <circle cx="341" cy="133" r="7" fill="#fff"/>
+    <circle cx="378" cy="133" r="7" fill="#fff"/>
+    <circle cx="415" cy="133" r="7" fill="#fff"/>
+    <circle cx="300" cy="200" r="16" fill="#fff"/>
+    <circle cx="428" cy="200" r="16" fill="#fff"/>
+    <!-- locomotive: cab -->
+    <rect x="150" y="62" width="84" height="128" rx="14" fill="#4aa3df"/>
+    <path d="M140 62 Q192 38 244 62 Z" fill="#e5463b"/>
+    <rect x="168" y="80" width="48" height="40" rx="10" fill="#fff6c9"/>
+    <!-- boiler -->
+    <rect x="40" y="110" width="118" height="80" rx="30" fill="#ffcf3f"/>
+    <!-- chimney -->
+    <path d="M84 110 V76 H76 V64 H116 V76 H108 V110 Z" fill="#e5463b"/>
+    <!-- bumper -->
+    <rect x="26" y="174" width="22" height="16" rx="5" fill="#e5463b"/>
+    <!-- wheels -->
+    <circle cx="80" cy="198" r="20" fill="#e5463b"/>
+    <circle cx="130" cy="198" r="20" fill="#e5463b"/>
+    <circle cx="196" cy="194" r="24" fill="#e5463b"/>
+    <path d="M80 198 H196" fill="none"/>
+  </g>
+  <!-- wheel hubs -->
+  <g fill="#fff">
+    <circle cx="80" cy="198" r="6"/><circle cx="130" cy="198" r="6"/><circle cx="196" cy="194" r="7"/>
+    <circle cx="300" cy="200" r="5" fill="#2b2b2b"/><circle cx="428" cy="200" r="5" fill="#2b2b2b"/>
+  </g>
+  <!-- face on the boiler -->
+  <g fill="#2b2b2b">
+    <circle cx="72" cy="140" r="5.5"/>
+    <circle cx="104" cy="140" r="5.5"/>
+    <circle cx="74" cy="138" r="1.8" fill="#fff"/><circle cx="106" cy="138" r="1.8" fill="#fff"/>
+  </g>
+  <circle cx="60" cy="156" r="7" fill="#ff8a7a" opacity=".7"/>
+  <circle cx="118" cy="156" r="7" fill="#ff8a7a" opacity=".7"/>
+  <path d="M76 156 Q88 168 100 156" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+  <!-- the wagon's note -->
+  <text x="364" y="94" text-anchor="middle" font-family="'Comic Sans MS','Chalkboard SE','Marker Felt',sans-serif" font-size="22" font-weight="700" fill="#2b2b2b">DO</text>
+  <!-- musical notes floating from the steam -->
+  <g fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round">
+    <ellipse cx="198" cy="34" rx="7" ry="5.5" transform="rotate(-20 198 34)"/>
+    <path d="M204 31 V8" fill="none"/>
+    <ellipse cx="236" cy="46" rx="6" ry="4.8" transform="rotate(-20 236 46)"/>
+    <path d="M241 44 V24 L254 28" fill="none"/>
+  </g>
+</svg>

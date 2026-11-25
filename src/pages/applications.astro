@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import Locked from '../components/Locked.astro';
+// Password protected for now: the content is in _protected/applications.html,
+// encrypted into public/protected/ by scripts/protect.mjs.
+---
+<Base title="Applications | MuTechLab" description="Applications for the music classroom, made at MuTechLab." path="/applications" noindex>
+  <div class="page">
+<h1 class="title">Applications</h1>
+<Locked file="/protected/applications.json" mode="html" />
+  </div>
+</Base>

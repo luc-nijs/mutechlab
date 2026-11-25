@@ -1,0 +1,89 @@
+---
+// A password form for content encrypted by scripts/protect.mjs.
+// `file` is the encrypted file in public/protected/; `mode` says what to do with it:
+// "html" puts it in the page, "app" runs it in a frame (with a full-screen link).
+// Once the password is right, the key is kept for this browser tab, so other locked pages open directly.
+interface Props { file: string; mode: 'html' | 'app'; title?: string }
+const { file, mode, title = '' } = Astro.props;
+---
+<div class="locked" data-file={file} data-mode={mode} data-title={title}>
+  <form class="lock-form">
+    <p>This page is password protected for now.</p>
+    <label>Password <input type="password" name="pw" autocomplete="current-password" required /></label>
+    <button type="submit">Open</button>
+    <p class="lock-msg" role="alert" hidden></p>
+  </form>
+  <div class="lock-out" hidden></div>
+</div>
+
+<script>
+  const STORE = 'mtl-key';
+  const bytes = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+  async function keyFrom(pw: string, salt: string, iterations: number) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes(salt), iterations, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+  }
+
+  async function decrypt(box: { iv: string; data: string }, key: CryptoKey) {
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(box.iv) }, key, bytes(box.data));
+    return new TextDecoder().decode(plain);
+  }
+
+  function show(root: HTMLElement, html: string) {
+    const out = root.querySelector<HTMLElement>('.lock-out')!;
+    if (root.dataset.mode === 'app') {
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      out.innerHTML = '';
+      const bar = document.createElement('p');
+      bar.className = 'app-back';
+      bar.innerHTML = '<a href="/applications">← Applications</a> <span>·</span> ';
+      const full = document.createElement('a');
+      full.href = url; full.target = '_blank'; full.textContent = 'Open full screen';
+      bar.append(full);
+      const frame = document.createElement('iframe');
+      frame.className = 'app-frame';
+      frame.title = root.dataset.title || '';
+      frame.src = url;
+      out.append(bar, frame);
+    } else {
+      out.innerHTML = html;
+    }
+    root.querySelector('form')!.hidden = true;
+    out.hidden = false;
+  }
+
+  document.querySelectorAll<HTMLElement>('.locked').forEach(async (root) => {
+    const box = await fetch(root.dataset.file!).then((r) => r.json());
+    const form = root.querySelector('form')!;
+    const msg = root.querySelector<HTMLElement>('.lock-msg')!;
+
+    // Already unlocked in this tab?
+    const saved = sessionStorage.getItem(STORE);
+    if (saved) {
+      try {
+        const { salt, jwk } = JSON.parse(saved);
+        if (salt === box.salt) {
+          const key = await crypto.subtle.importKey('jwk', jwk, 'AES-GCM', true, ['decrypt']);
+          show(root, await decrypt(box, key));
+          return;
+        }
+      } catch { sessionStorage.removeItem(STORE); }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.hidden = true;
+      const pw = (form.elements.namedItem('pw') as HTMLInputElement).value;
+      try {
+        const key = await keyFrom(pw, box.salt, box.iterations);
+        show(root, await decrypt(box, key));
+        sessionStorage.setItem(STORE, JSON.stringify({ salt: box.salt, jwk: await crypto.subtle.exportKey('jwk', key) }));
+      } catch {
+        msg.textContent = 'Wrong password, please try again.';
+        msg.hidden = false;
+      }
+    });
+  });
+</script>

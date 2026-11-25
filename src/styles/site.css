@@ -59,6 +59,29 @@ header.top nav { flex: 1; }
 .card .sub { margin: 0 0 8px; font-size: 16px; }
 .card img { width: 76px; height: 76px; object-fit: contain; }
 
+/* Applications: one card per app, picture on top */
+.intro { max-width: 680px; margin: 0 0 22px; }
+.apps { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
+.app { display: flex; flex-direction: column; padding: 16px; border: 1px solid var(--pale); }
+.app img { width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: contain; background: #fffaf0; }
+.app .sub { margin: 14px 0 6px; }
+.app p { margin: 0 0 8px; }
+.app .soon { margin-top: auto; color: var(--mid); font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+
+.app a.open { margin-top: auto; font-weight: 600; }
+.app-back { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+.app-back span { margin: 0 6px; color: var(--mid); }
+.app-frame { display: block; width: 100%; height: calc(100vh - 170px); min-height: 560px; border: 1px solid var(--pale); background: #fffdf7; }
+
+/* Password form for protected pages */
+.lock-form { max-width: 360px; padding: 18px; border: 1px solid var(--pale); }
+.lock-form p { margin: 0 0 12px; }
+.lock-form label { display: block; margin-bottom: 12px; color: var(--dark); font-weight: 600; }
+.lock-form input { display: block; width: 100%; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--mid); font: inherit; }
+.lock-form button { padding: 8px 18px; background: var(--red); border: 0; color: #fff; font: 600 14px var(--body); cursor: pointer; }
+.lock-form button:hover { background: var(--dark); }
+.lock-msg { margin: 12px 0 0 !important; color: var(--red); font-weight: 600; }
+
 /* Agenda: one size for all sessions */
 .sessions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px 14px; }
 .session { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 8px; font-size: 13.5px; }

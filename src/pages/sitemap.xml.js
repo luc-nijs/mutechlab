@@ -1,7 +1,8 @@
 // Lists every page for search engines. New pages in src/pages are added automatically.
-// Left out: the error page, and the two short link pages that are hidden from search (t8, dataduo).
+// Left out: the error page, the two short link pages that are hidden from search (t8, dataduo),
+// and the password-protected pages (applications, compo-train).
 // The old Wix addresses are redirects, so they never appear here.
-const excluded = new Set(['404', 't8', 'dataduo']);
+const excluded = new Set(['404', 't8', 'dataduo', 'applications', 'compo-train']);
 
 export function GET({ site }) {
   const slugs = Object.keys(import.meta.glob('./*.astro'))
