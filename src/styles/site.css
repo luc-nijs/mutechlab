@@ -68,6 +68,7 @@ header.top nav { flex: 1; }
 .app p { margin: 0 0 8px; }
 .app .soon { margin-top: auto; color: var(--mid); font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
 
+.app .by { color: var(--mid); font-size: 13px; font-style: italic; }
 .app a.open { margin-top: auto; font-weight: 600; }
 .app-back { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
 .app-back span { margin: 0 6px; color: var(--mid); }
